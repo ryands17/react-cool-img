@@ -13,6 +13,7 @@ interface Args extends Options {
 }
 
 const renderHelper = ({
+  // @ts-expect-error
   root = null,
   rootMargin = "50px",
   threshold = 0.01,
@@ -24,7 +25,7 @@ const renderHelper = ({
 describe("useObserver › messages", () => {
   const mockIntersectionObserver = jest.fn((_, { threshold }) => ({
     threshold,
-    disconnect: (): void => null,
+    disconnect: () => null,
   }));
 
   beforeAll(() => {
@@ -50,6 +51,7 @@ describe("useObserver › messages", () => {
     expect(console.error).not.toHaveBeenCalled();
     expect(cur[1]).toBeFalsy();
 
+    // @ts-ignore
     delete global.IntersectionObserver;
     cur = renderHelper().current;
     expect(console.error).toHaveBeenNthCalledWith(1, observerErr);
@@ -57,6 +59,7 @@ describe("useObserver › messages", () => {
 
     // @ts-expect-error
     global.IntersectionObserver = mockIntersectionObserver;
+    // @ts-ignore
     delete global.IntersectionObserverEntry;
     cur = renderHelper().current;
     expect(console.error).toHaveBeenNthCalledWith(2, observerErr);
@@ -83,18 +86,19 @@ describe("useObserver", () => {
   const setIsIntersecting = (
     isIntersecting: boolean,
     intersectionRatio?: number
-  ): void => {
+  ) => {
     callback([{ isIntersecting, intersectionRatio }]);
   };
 
   beforeAll(() => {
     // @ts-expect-error
     global.IntersectionObserver = jest.fn(
+      // @ts-expect-error
       (cb: Callback, { root, rootMargin, threshold }) => ({
         root,
         rootMargin,
         threshold,
-        observe: (): void => {
+        observe: () => {
           callback = cb;
         },
         disconnect,
@@ -227,6 +231,7 @@ describe("useObserver", () => {
       setRef(img);
     });
 
+    // @ts-expect-error
     setIsIntersecting(undefined, 1);
 
     act(() => {

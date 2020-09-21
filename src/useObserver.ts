@@ -1,4 +1,11 @@
-import { Dispatch, useState, useRef, useEffect, useCallback } from "react";
+import {
+  Dispatch,
+  MutableRefObject,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 
 export const observerErr =
   "💡react-cool-img: the browser doesn't support Intersection Observer, please install polyfill to enable lazy loading: https://github.com/wellyshen/react-cool-img#intersection-observer-polyfill";
@@ -18,8 +25,10 @@ export default (
 ): Return => {
   const [startLoad, setStartLoad] = useState<boolean>(false);
   const [el, setEl] = useState<HTMLElement | null>(null);
-  const observerRef = useRef<IntersectionObserver>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>(null);
+  const observerRef: MutableRefObject<IntersectionObserver | null> = useRef(
+    null
+  );
+  const timeoutRef: MutableRefObject<NodeJS.Timeout | null> = useRef(null);
   const erroredRef = useRef<boolean>(false);
   let numThreshold = threshold;
 
@@ -28,7 +37,7 @@ export default (
     numThreshold = 0;
   }
 
-  const resetTimeout = useCallback((): void => {
+  const resetTimeout = useCallback(() => {
     if (!timeoutRef.current) return;
 
     clearTimeout(timeoutRef.current);
@@ -45,7 +54,7 @@ export default (
         erroredRef.current = true;
       }
       setStartLoad(true);
-      return (): void => null;
+      return () => null;
     }
 
     // eslint-disable-next-line compat/compat
@@ -69,7 +78,7 @@ export default (
 
     if (el) observer.observe(el);
 
-    return (): void => {
+    return () => {
       observer.disconnect();
       resetTimeout();
     };

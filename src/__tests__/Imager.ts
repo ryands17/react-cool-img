@@ -1,4 +1,4 @@
-/*  eslint-disable compat/compat */
+/*  eslint-disable compat/compat, @typescript-eslint/no-unused-vars */
 
 import Imager, { Retry } from "../Imager";
 
@@ -28,15 +28,15 @@ describe("Imager", () => {
   const createImage = (instance: Imager): Return => ({
     load: ({
       src = SUCCESS_SRC,
-      crossOrigin = null,
       decode = false,
       retry = {},
-      onError = (): void => null,
-      onLoad = (): void => null,
-    }: E = {}): void => {
-      instance.load(src, crossOrigin, decode, retry, onError, onLoad);
+      onError = () => null,
+      onLoad = () => null,
+      crossOrigin,
+    }: E = {}) => {
+      instance.load(src, decode, retry, onError, onLoad, crossOrigin);
     },
-    unload: (): void => {
+    unload: () => {
       instance.unload();
     },
   });
@@ -48,8 +48,8 @@ describe("Imager", () => {
       let src = "";
 
       return {
-        onerror: (): void => null,
-        onload: (): void => null,
+        onerror: (e: any) => null,
+        onload: (e: any) => null,
         decode: jest.fn(() => Promise.resolve()),
         set src(val: string) {
           if (val === FAILURE_SRC) setTimeout(() => this.onerror(ERROR_EVT));
@@ -78,7 +78,7 @@ describe("Imager", () => {
   it("should call onError without auto-retry", () => {
     return new Promise((done) => {
       const image = createImage(new Imager());
-      const onError = (event: Event): void => {
+      const onError = (event: Event) => {
         expect(event).toMatchObject(ERROR_EVT);
         done();
       };
@@ -96,7 +96,7 @@ describe("Imager", () => {
   it("should call onError with auto-retry", () => {
     return new Promise((done) => {
       const image = createImage(new Imager());
-      const onError = (event: Event): void => {
+      const onError = (event: Event) => {
         expect(event).toMatchObject(ERROR_EVT);
         done();
       };
@@ -124,7 +124,7 @@ describe("Imager", () => {
     return new Promise((done) => {
       const image = createImage(new Imager());
       const onError = jest.fn();
-      const onLoad = (event: Event): void => {
+      const onLoad = (event: Event) => {
         expect(event).toMatchObject(LOAD_EVT);
         done();
       };
